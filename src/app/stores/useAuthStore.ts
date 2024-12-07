@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:3333" : "/";
 
 export const useAuthStore = create((set: any, get: any) => ({
-  authUser: null,
+  authUser:typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
@@ -15,19 +15,19 @@ export const useAuthStore = create((set: any, get: any) => ({
   onlineUsers: [],
   socket: null,
 
-  checkAuth: async (token:any) => {
+  checkAuth: async (token: any) => {
     try {
+      set({ isCheckingAuth: true })
       const res = await axiosInstance.get("/auth/check", {
-        headers:{
-          Authorization:`Bearer ${token}`
+        headers: {
+          Authorization: `Bearer ${token}`
         }
       });
       set({ authUser: res.data });
-      console.log('aqui por favor ' + res.data)
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
-      set({ authUser: token });
+      set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
     }

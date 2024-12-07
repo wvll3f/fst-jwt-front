@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { useAuthStore } from "../stores/useAuthStore"
 import toast, { LoaderIcon, Toaster } from "react-hot-toast"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 const formSchema = z.object({
     email: z.string().min(2, {
@@ -29,7 +30,7 @@ const formSchema = z.object({
 })
 
 export default function Login() {
-    const { login, isLoggingIn,authUser } = useAuthStore();
+    const { login, isLoggingIn, authUser } = useAuthStore();
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -39,6 +40,8 @@ export default function Login() {
             password: ""
         },
     })
+
+    if(authUser) router.push('/');
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         await login(values).then(() => {
@@ -55,6 +58,7 @@ export default function Login() {
     }
 
     return (
+        <div className="flex flex-col bg-slate-900 text-white justify-center items-center w-screen h-screen">
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
@@ -87,5 +91,6 @@ export default function Login() {
             </form>
             <Toaster />
         </Form>
+        </div>
     )
 }
