@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useAuthStore } from "../stores/useAuthStore"
-import { useState } from "react"
+import toast, { LoaderIcon, Toaster } from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
     email: z.string().min(2, {
@@ -28,8 +29,9 @@ const formSchema = z.object({
 })
 
 export default function Login() {
-    const { login, isLoggingIn } = useAuthStore();
-    
+    const { login, isLoggingIn,authUser } = useAuthStore();
+    const router = useRouter()
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -39,8 +41,17 @@ export default function Login() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        await login(values);
-        console.log(values)
+        await login(values).then(() => {
+            router.push('/');
+        })
+    }
+
+    if (isLoggingIn) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <LoaderIcon className="size-10 animate-spin" />
+            </div>
+        )
     }
 
     return (
@@ -74,6 +85,7 @@ export default function Login() {
                 />
                 <Button type="submit">Submit</Button>
             </form>
+            <Toaster />
         </Form>
     )
 }
