@@ -1,7 +1,23 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useChatStore } from '../stores/useChatStore';
+import { useAuthStore } from '../stores/useAuthStore';
 
 function SideBar() {
+    const { getUsers, isUsersLoading, users } = useChatStore();
+    const { onlineUsers } = useAuthStore();
+    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+
+    useEffect(() => {
+        getUsers();
+    }, [getUsers])
+
+    const filteredUsers = showOnlineOnly
+        ? users.filter((user) => onlineUsers.includes(user._id))
+        : users;
+
+    if (isUsersLoading) return <div ></div>;
+
     return (
         <div className=" justify-between h-screen text-white bg-slate-800 w-44 flex flex-col items-start border-slate-700 border-r-2">
 

@@ -8,13 +8,13 @@ import SideBar from "./components/SideBar";
 
 
 export default function Home() {
-  const { checkAuth, isCheckingAuth,authUser } = useAuthStore();
+  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
   const router = useRouter()
 
   useEffect(() => {
-    console.log(authUser)
-    if(!authUser){router.push('/login')}
+
     async function callback() {
+      if (authUser == null || !authUser) router.push('/login');
       await checkAuth(authUser)
     }
     callback()
@@ -34,7 +34,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center flex-1 h-full">
         <header className="text-center">
           <h1 className="font-bold text-xl">Welcome to SuperChat!</h1>
-          <h3>it's my first steps with webSockets apps</h3>
+          <h3>it&apos;s my first steps with webSockets apps</h3>
         </header>
       </div>
       <Toaster />

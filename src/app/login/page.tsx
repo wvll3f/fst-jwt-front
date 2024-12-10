@@ -58,9 +58,10 @@ export default function Login() {
     }
 
     return (
-        <div className="flex flex-col bg-slate-900 text-white justify-center items-center w-screen h-screen">
+        <div className="flex flex-col bg-slate-900 text-white justify-center items-center w-screen h-screen space-y-16">
+            <h1 className="font-bold text-4xl">Welcome to login page :)</h1>
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-72">
                 <FormField
                     control={form.control}
                     name="email"
