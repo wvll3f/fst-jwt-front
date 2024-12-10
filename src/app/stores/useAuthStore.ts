@@ -4,10 +4,20 @@ import { axiosInstance } from "@/app/lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
+interface IAuthStore {
+  isSigningUp: boolean,
+  isLoggingIn: boolean,
+  isUpdatingProfile: boolean,
+  isCheckingAuth: boolean,
+  onlineUsers: any[],
+  socket: any,
+  login: (data: any) => Promise<void>,
+}
+
 const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:3333" : "/";
 
-export const useAuthStore = create((set: any, get: any) => ({
-  authUser:typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
+export const useAuthStore = create<IAuthStore>((set: any, get: any) => ({
+  authUser: typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,

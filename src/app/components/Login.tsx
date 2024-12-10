@@ -43,7 +43,6 @@ export function Login() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         login(values);
-        console.log(values)
     }
 
     return (
