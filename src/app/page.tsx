@@ -5,10 +5,13 @@ import { LoaderIcon, Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/useAuthStore";
 import { useRouter } from 'next/navigation'
 import SideBar from "./components/SideBar";
+import NoChatSelected from "./components/NoChatSelected";
+import { useChatStore } from "./stores/useChatStore";
 
 
 export default function Home() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+  const { selectedUser } = useChatStore();
   const router = useRouter()
 
   useEffect(() => {
@@ -31,12 +34,7 @@ export default function Home() {
   return (
     <div className="flex items-center h-screen w-screen bg-slate-900 text-white">
       <SideBar />
-      <div className="flex flex-col items-center justify-center flex-1 h-full">
-        <header className="text-center">
-          <h1 className="font-bold text-xl">Welcome to SuperChat!</h1>
-          <h3>it&apos;s my first steps with webSockets apps</h3>
-        </header>
-      </div>
+      {selectedUser ? <><h1>{selectedUser.email}</h1></> :<NoChatSelected />}
       <Toaster />
     </div>
   )

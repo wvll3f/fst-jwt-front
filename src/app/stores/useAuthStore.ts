@@ -11,7 +11,10 @@ interface IAuthStore {
   isCheckingAuth: boolean,
   onlineUsers: any[],
   socket: any,
+  authUser:string | null,
   login: (data: any) => Promise<void>,
+  checkAuth: (data: any) => Promise<void>,
+
 }
 
 const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:3333" : "/";
