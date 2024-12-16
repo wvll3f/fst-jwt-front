@@ -16,7 +16,6 @@ const ChatContainer = () => {
         } catch (error) {
             toast.error('Messages not found')
         }
-
     }, [selectedUser])
 
     if (isMessagesLoading) return <div> <LoaderIcon /></div>;

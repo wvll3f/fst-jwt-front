@@ -2,12 +2,11 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { AxiosResponse } from "axios";
 import { useAuthStore } from "./useAuthStore";
-interface User {
+export interface IUser {
   id: string;
   name: string;
   email: string;
 }
-
 interface Message {
   id: number;
   text: string;
@@ -15,16 +14,15 @@ interface Message {
   receiverId: number;
   timestamp: string;
 }
-
 interface IChateStore {
   messages: Message[];
-  users: User[];
-  selectedUser: User | null;
+  users: IUser[] | [];
+  selectedUser: IUser | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
-  getUsers: () => Promise<void>;
-  setSelectedUser: (selectedUser: User) => any
-  getMessages: (id:string) => Promise<void>,
+  getUsers: () => Promise<IUser[]>;
+  setSelectedUser: (selectedUser: IUser) => any
+  getMessages: (id: string) => Promise<void>,
 }
 
 export const useChatStore = create<IChateStore>((get: any, set: any) => ({
@@ -34,24 +32,27 @@ export const useChatStore = create<IChateStore>((get: any, set: any) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  setSelectedUser: (selectedUser: User) => {
-    set((state: any) => {
-      if (state.selectedUser?.id !== selectedUser.id) {
-        return { selectedUser };
-      }
-      return state;
-    });
-  },
+  // setSelectedUser: (selectedUser: User) => {
+  //   set((state: any) => {
+  //     if (state.selectedUser?.id !== selectedUser.id) {
+  //       return { selectedUser };
+  //     }
+  //     return state;
+  //   });
+  // },
+
+  setSelectedUser: (selectedUser) => set({ selectedUser }),
 
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
-      const res: AxiosResponse<User[]> = await axiosInstance.get("/users/sideuser", {
+      const res = await axiosInstance.get("/users/sideuser", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
       set({ users: res.data });
+      return res.data;
     } catch (error: any) {
       console.log(error);
       //toast.error(error.response.data.message); // Caso queira mostrar um erro

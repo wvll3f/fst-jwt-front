@@ -9,6 +9,7 @@ import NoChatSelected from "./components/NoChatSelected";
 import { useChatStore } from "./stores/useChatStore";
 
 
+
 export default function Home() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
   const { selectedUser } = useChatStore();
@@ -34,7 +35,7 @@ export default function Home() {
   return (
     <div className="flex items-center h-screen w-screen bg-slate-900 text-white">
       <SideBar />
-      {selectedUser ? <><h1>{selectedUser.email}</h1></> :<NoChatSelected />}
+      {selectedUser ? <> <h1>{selectedUser.email}</h1> </> :<NoChatSelected />}
       <Toaster />
     </div>
   )

@@ -1,25 +1,30 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useChatStore } from '../stores/useChatStore';
+import { IUser, useChatStore } from '../stores/useChatStore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { LoaderIcon } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 function SideBar() {
-    const { getUsers, isUsersLoading, users, setSelectedUser } = useChatStore();
+    const { getUsers, isUsersLoading, setSelectedUser } = useChatStore();
+    const router = useRouter();
+
     const { onlineUsers } = useAuthStore();
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+    const [userSide, setUserSide] = useState<IUser[]>([]);
 
-    useEffect( () => {
-        async function callback(){
-            await getUsers();
-            console.log(users)
-        } 
+    useEffect(() => {
+        async function callback() {
+            const temp = await getUsers();
+            setUserSide(temp)
+        }
         callback()
-    }, [users])
+    }, [getUsers])
+
 
     const filteredUsers = showOnlineOnly
-        ? users.filter((user) => onlineUsers.includes(user.id))
-        : users;
+        ? userSide.filter((user) => onlineUsers.includes(user.id))
+        : userSide;
 
     if (isUsersLoading) return <div> <LoaderIcon /></div>;
 
@@ -29,6 +34,7 @@ function SideBar() {
             <aside className='w-full'>
                 <header className='p-3'>
                     <h1 className="font-bold text-lg">Super Chat</h1>
+                    <h1></h1>
                 </header>
                 <div>
                     <label className="cursor-pointer flex items-center gap-2 p-3">
@@ -40,10 +46,8 @@ function SideBar() {
                         />
                         <span className="text-sm">Show online only</span>
                     </label>
-                    <h1>{filteredUsers.length}</h1>
-                    <h1>{users.length}</h1>
                     {
-                        users.map((user) => (
+                        filteredUsers.map((user) => (
                             <ul key={user.id}
                                 onClick={setSelectedUser(user)}
                                 className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer'>
@@ -57,7 +61,12 @@ function SideBar() {
             </aside>
 
             <ul className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer space-x-4 w-full '>
-                <li className=' w-full text-center rounded-md flex-1'>Logout</li>
+                <li className=' w-full text-center rounded-md flex-1'
+                    onClick={() =>{ 
+                        localStorage.removeItem('accessToken') 
+                        router.push('/login')
+                    }}
+                >Logout</li>
             </ul>
         </div>
     )
