@@ -2,26 +2,26 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { AxiosResponse } from "axios";
 import { useAuthStore } from "./useAuthStore";
-export interface IUser {
+export type IUser = {
   id: string;
   name: string;
   email: string;
 }
-interface Message {
+type Message = {
   id: number;
   text: string;
   senderId: number;
   receiverId: number;
   timestamp: string;
 }
-interface IChateStore {
+type IChateStore =  {
   messages: Message[];
   users: IUser[] | [];
   selectedUser: IUser | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
   getUsers: () => Promise<IUser[]>;
-  setSelectedUser: (selectedUser: IUser) => any
+  setSelectedUser: (selectedUser: IUser) => void
   getMessages: (id: string) => Promise<void>,
 }
 
@@ -32,16 +32,16 @@ export const useChatStore = create<IChateStore>((get: any, set: any) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  // setSelectedUser: (selectedUser: User) => {
-  //   set((state: any) => {
-  //     if (state.selectedUser?.id !== selectedUser.id) {
-  //       return { selectedUser };
-  //     }
-  //     return state;
-  //   });
-  // },
+  setSelectedUser: (selectedUser: IUser) => {
+    set((state: any) => {
+      if (state.selectedUser?.id !== selectedUser.id) {
+        return { selectedUser };
+      }
+      return state;
+    });
+  },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  // setSelectedUser: (user) => set(() => {selectedUser:{ user }}),
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -51,7 +51,7 @@ export const useChatStore = create<IChateStore>((get: any, set: any) => ({
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      set({ users: res.data });
+      set((state:any) => { users: [...state.users, res.data] });
       return res.data;
     } catch (error: any) {
       console.log(error);
@@ -69,7 +69,7 @@ export const useChatStore = create<IChateStore>((get: any, set: any) => ({
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       })
-      set({ messages: res.data })
+      set((state:any) => { messages: [...state.messages, res.data] });
     } catch (error) {
       console.log(error)
     } finally {

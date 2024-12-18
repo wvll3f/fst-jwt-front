@@ -44,9 +44,8 @@ export default function Login() {
     if(authUser) router.push('/');
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        await login(values).then(() => {
-            router.push('/');
-        })
+        await login(values)
+        if(authUser){router.push('/')}
     }
 
     if (isLoggingIn) {

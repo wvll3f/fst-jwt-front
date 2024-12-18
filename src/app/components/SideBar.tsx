@@ -2,11 +2,15 @@
 import React, { useEffect, useState } from 'react'
 import { IUser, useChatStore } from '../stores/useChatStore';
 import { useAuthStore } from '../stores/useAuthStore';
-import { LoaderIcon } from 'react-hot-toast';
+import { LoaderIcon, Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 function SideBar() {
-    const { getUsers, isUsersLoading, setSelectedUser } = useChatStore();
+    const { getUsers, isUsersLoading } = useChatStore();
+
+    const setSelectedUser  = useChatStore.getState().setSelectedUser;
+    const selectedUser  = useChatStore.getState().selectedUser;
+
     const router = useRouter();
 
     const { onlineUsers } = useAuthStore();
@@ -49,7 +53,12 @@ function SideBar() {
                     {
                         filteredUsers.map((user) => (
                             <ul key={user.id}
-                                onClick={setSelectedUser(user)}
+                                onClick={() => {
+                                    setSelectedUser(user)
+                                    console.log(selectedUser)
+                                    console.log(user)
+                                }
+                                }
                                 className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer'>
                                 <li className='p-2 rounded-full w-8 h-8 bg-white'>&nbsp;</li>
                                 <li className=' w-full text-center rounded-md flex-1' >{user.name}</li>
@@ -62,12 +71,13 @@ function SideBar() {
 
             <ul className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer space-x-4 w-full '>
                 <li className=' w-full text-center rounded-md flex-1'
-                    onClick={() =>{ 
-                        localStorage.removeItem('accessToken') 
+                    onClick={() => {
+                        localStorage.removeItem('accessToken')
                         router.push('/login')
                     }}
                 >Logout</li>
             </ul>
+            <Toaster/>
         </div>
     )
 }

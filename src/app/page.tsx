@@ -16,9 +16,10 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-
+    if (authUser == null) {
+      router.push('/login');
+    }
     async function callback() {
-      if (authUser == null || !authUser) router.push('/login');
       await checkAuth(authUser)
     }
     callback()
@@ -35,7 +36,7 @@ export default function Home() {
   return (
     <div className="flex items-center h-screen w-screen bg-slate-900 text-white">
       <SideBar />
-      {selectedUser ? <> <h1>{selectedUser.email}</h1> </> :<NoChatSelected />}
+      {selectedUser ? <> <h1>{selectedUser.email}</h1> </> : <NoChatSelected />}
       <Toaster />
     </div>
   )
