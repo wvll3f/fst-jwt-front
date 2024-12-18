@@ -1,34 +1,29 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { IUser, useChatStore } from '../stores/useChatStore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { LoaderIcon, Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { useChatContext } from '../context/ChatContext';
 
 function SideBar() {
-    const { getUsers, isUsersLoading } = useChatStore();
-
-    const setSelectedUser  = useChatStore.getState().setSelectedUser;
-    const selectedUser  = useChatStore.getState().selectedUser;
+    const { getUsers, isUsersLoading, users, setSelectedUser } = useChatContext();
 
     const router = useRouter();
 
     const { onlineUsers } = useAuthStore();
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-    const [userSide, setUserSide] = useState<IUser[]>([]);
 
     useEffect(() => {
         async function callback() {
-            const temp = await getUsers();
-            setUserSide(temp)
+            await getUsers();
         }
         callback()
-    }, [getUsers])
+    }, [])
 
 
     const filteredUsers = showOnlineOnly
-        ? userSide.filter((user) => onlineUsers.includes(user.id))
-        : userSide;
+        ? users.filter((user) => onlineUsers.includes(user.id))
+        : users;
 
     if (isUsersLoading) return <div> <LoaderIcon /></div>;
 
@@ -55,8 +50,6 @@ function SideBar() {
                             <ul key={user.id}
                                 onClick={() => {
                                     setSelectedUser(user)
-                                    console.log(selectedUser)
-                                    console.log(user)
                                 }
                                 }
                                 className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer'>
@@ -77,7 +70,7 @@ function SideBar() {
                     }}
                 >Logout</li>
             </ul>
-            <Toaster/>
+            <Toaster />
         </div>
     )
 }

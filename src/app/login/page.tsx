@@ -15,10 +15,10 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useAuthStore } from "../stores/useAuthStore"
 import toast, { LoaderIcon, Toaster } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { useAuthContext } from "../context/AuthContext"
 
 const formSchema = z.object({
     email: z.string().min(2, {
@@ -30,7 +30,7 @@ const formSchema = z.object({
 })
 
 export default function Login() {
-    const { login, isLoggingIn, authUser } = useAuthStore();
+    const { login, isLoggingIn, authUser } = useAuthContext();
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
