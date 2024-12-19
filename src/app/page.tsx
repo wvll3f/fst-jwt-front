@@ -7,8 +7,7 @@ import SideBar from "./components/SideBar";
 import NoChatSelected from "./components/NoChatSelected";
 import { useAuthContext } from "./context/AuthContext";
 import { useChatContext } from "./context/ChatContext";
-
-
+import ChatContainer from "./components/ChatContainer";
 
 export default function Home() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthContext();
@@ -17,13 +16,13 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    if (authUser == null) {
-      router.push('/login');
-    }
     async function callback() {
       await checkAuth(authUser!)
     }
     callback()
+    if (authUser == null) {
+      router.push('/login');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -37,7 +36,7 @@ export default function Home() {
   return (
     <div className="flex items-center h-screen w-screen bg-slate-900 text-white">
       <SideBar />
-      {selectedUser ? <> <h1>{selectedUser.email}</h1> </> : <NoChatSelected />}
+      {selectedUser ? <> <ChatContainer/> </> : <NoChatSelected />}
       <Toaster />
     </div>
   )

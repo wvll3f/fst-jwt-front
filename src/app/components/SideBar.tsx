@@ -28,7 +28,7 @@ function SideBar() {
     if (isUsersLoading) return <div> <LoaderIcon /></div>;
 
     return (
-        <div className=" justify-between h-screen text-white bg-slate-800 w-44 flex flex-col items-start border-slate-700 border-r-2">
+        <div className=" justify-between h-screen text-white bg-slate-800 w-52 flex flex-col items-start border-slate-900 border-r-4">
 
             <aside className='w-full'>
                 <header className='p-3'>
@@ -54,7 +54,7 @@ function SideBar() {
                                 }
                                 className='flex text-lg p-2 mt-2 items-center hover:bg-slate-900 cursor-pointer'>
                                 <li className='p-2 rounded-full w-8 h-8 bg-white'>&nbsp;</li>
-                                <li className=' w-full text-center rounded-md flex-1' >{user.name}</li>
+                                <li className=' w-full ml-4 rounded-md flex-1' >{user.name}</li>
                             </ul>
                         ))
                     }

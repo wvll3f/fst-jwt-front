@@ -1,7 +1,9 @@
 'use client'
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { axiosInstance } from "../lib/axios"; 
-import { useAuthStore } from "../stores/useAuthStore";
+import React, { createContext, useContext, useState } from 'react';
+import { axiosInstance } from "../lib/axios";
+import toast from 'react-hot-toast';
+// import { useAuthContext } from './AuthContext';
+
 
 export type IUser = {
   id: string;
@@ -10,10 +12,10 @@ export type IUser = {
 }
 
 type Message = {
-  id: number;
+  id: string;
   text: string;
-  senderId: number;
-  receiverId: number;
+  senderId: string;
+  receiverId: string;
   timestamp: string;
 }
 
@@ -26,6 +28,7 @@ interface IChatContext {
   getUsers: () => Promise<void>;
   setSelectedUser: (selectedUser: IUser) => void;
   getMessages: (id: string) => Promise<void>;
+  sendMessages: (messageData: any) => Promise<void>;
 }
 
 const ChatContext = createContext<IChatContext | undefined>(undefined);
@@ -56,7 +59,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const getMessages = async (id: string) => {
     setIsMessagesLoading(true);
     try {
-      const res = await axiosInstance.get(`messages/${id}`, {
+      const res = await axiosInstance.get(`chat/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -69,9 +72,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const sendMessages = async (messageData: any) => {
+    try {
+      const res = await axiosInstance.post(`/new-message/${selectedUser?.id}`, messageData);
+      setMessages(res.data)
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+
   // Subscribe and unsubscribe to socket messages
   // useEffect(() => {
-  //   const socket = useAuthStore.getState().socket;
+  //   const socket = useAuthContext.getState().socket;
 
   //   const handleNewMessage = (newMessage: any) => {
   //     if (selectedUser && newMessage.senderId === selectedUser.id) {
@@ -95,7 +108,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isMessagesLoading,
       getUsers,
       setSelectedUser,
-      getMessages
+      getMessages,
+      sendMessages
     }}>
       {children}
     </ChatContext.Provider>

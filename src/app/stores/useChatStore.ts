@@ -10,8 +10,8 @@ export type IUser = {
 type Message = {
   id: number;
   text: string;
-  senderId: number;
-  receiverId: number;
+  senderId: string;
+  receiverId: string;
   timestamp: string;
 }
 type IChateStore =  {

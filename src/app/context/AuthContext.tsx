@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { axiosInstance } from "@/app/lib/axios"; // Ensure axiosInstance is properly imported
 import toast from "react-hot-toast";
 import io from "socket.io-client";
-import { Socket } from 'socket.io-client';
+
 
 interface IAuthStore {
   isSigningUp: boolean;
@@ -11,7 +11,7 @@ interface IAuthStore {
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
   onlineUsers: any[];
-  socket: typeof Socket | null; // Use Socket type from socket.io-client
+  socket: any;
   authUser: string | null;
   login: (data: any) => Promise<void>;
   checkAuth: (token: string) => Promise<void>;
@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
-  const [socket, setSocket] = useState<typeof Socket | null>(null); 
+  const [socket, setSocket] = useState<any>(null); 
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
@@ -113,16 +113,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const connectSocket = (userId: string) => {
     if (!userId || socket?.connected) return;
-
+  
     const newSocket = io(BASE_URL, { query: { userId } });
-
-    newSocket.connect();
+  
     setSocket(newSocket);
-
-    newSocket.on("getOnlineUsers", (userIds: any) => {
+  
+    newSocket.on("getOnlineUsers", (userIds: string[]) => {
       setOnlineUsers(userIds);
     });
+  
+    newSocket.on("disconnect", () => {
+      setSocket(null); // Limpeza na desconexão
+    });
   };
+  
 
   const disconnectSocket = () => {
     if (socket?.connected) socket.disconnect();
