@@ -17,27 +17,26 @@ export default function Home() {
 
   useEffect(() => {
     async function callback() {
-      await checkAuth(authUser!)
+      console.log(authUser)
+      if (authUser) await checkAuth(authUser.accessToken)
+      if (!authUser?.accessToken) router.push('/login');
     }
     callback()
-    if (authUser == null) {
-      router.push('/login');
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isCheckingAuth)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-dvh">
         <LoaderIcon className="size-25 animate-spin" />
       </div>
     );
 
   return (
-    <div className="flex items-center h-screen w-screen bg-slate-900 text-white">
+    <div className="flex h-dvh w-dvw bg-slate-900 text-white">
       <SideBar />
-      {selectedUser ? <> <ChatContainer/> </> : <NoChatSelected />}
       <Toaster />
+      {selectedUser ? <ChatContainer /> : <NoChatSelected />}
     </div>
   )
 }

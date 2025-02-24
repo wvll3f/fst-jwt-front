@@ -1,16 +1,16 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useAuthStore } from '../stores/useAuthStore';
 import { LoaderIcon, Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useChatContext } from '../context/ChatContext';
+import { useAuthContext } from '../context/AuthContext';
 
 function SideBar() {
     const { getUsers, isUsersLoading, users, setSelectedUser } = useChatContext();
 
     const router = useRouter();
 
-    const { onlineUsers } = useAuthStore();
+    const { onlineUsers } = useAuthContext();
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
     useEffect(() => {
@@ -28,7 +28,7 @@ function SideBar() {
     if (isUsersLoading) return <div> <LoaderIcon /></div>;
 
     return (
-        <div className=" justify-between h-screen text-white bg-slate-800 w-52 flex flex-col items-start border-slate-900 border-r-4">
+        <div className=" justify-between h-dvh text-white bg-slate-800 w-52 flex flex-col items-start border-slate-900">
 
             <aside className='w-full'>
                 <header className='p-3'>

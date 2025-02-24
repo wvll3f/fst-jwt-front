@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useChatContext } from '../context/ChatContext';
-import { Send} from "lucide-react";
+import { Send } from "lucide-react";
 
 function MessageInput() {
 
@@ -9,7 +9,7 @@ function MessageInput() {
 
     const { sendMessages } = useChatContext();
 
-    const handleSendMessage = async (e:any) => {
+    const handleSendMessage = async (e: any) => {
         e.preventDefault();
         if (!text.trim()) return;
 

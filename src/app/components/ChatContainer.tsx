@@ -1,6 +1,6 @@
 'use Effect'
 import React, { useEffect } from 'react'
-import toast, { LoaderIcon, Toaster } from 'react-hot-toast';
+import { LoaderIcon, Toaster } from 'react-hot-toast';
 import { useChatContext } from '../context/ChatContext';
 import MessageInput from './MessageInput';
 
@@ -9,47 +9,46 @@ const ChatContainer = () => {
         getMessages,
         isMessagesLoading,
         selectedUser,
-        messages
+        messages,
+        subscribeToMessages,
     } = useChatContext();
 
     useEffect(() => {
-        try {
-            getMessages(selectedUser!.id)
-            console.log(messages)
-        } catch (error) {
-            toast.error('Messages not found')
-        }
-    }, [selectedUser])
+        getMessages(selectedUser!.id)
+        subscribeToMessages();
+    }, [])
 
     if (isMessagesLoading) return <div> <LoaderIcon /></div>;
 
     return (
-        <div className='h-screen flex flex-col w-screen relative '>
-            <Toaster />
-            {
-                messages ?
-                    messages.map((message) => (
-                        <ul key={message.id}
-                            className={message.receiverId == selectedUser?.id ?
-                                ` right-1 ml-4 rounded-md bg-green-800 flex text-lg p-2 mt-2 items-center` :
-                                ` left-1 ml-4 rounded-md bg-blue-800 flex text-lg p-2 mt-2 items-center`} 
-                            >
-                                
-                            <li
+        <div className='h-dvh flex flex-col justify-between gap-3 p-3 w-dvw'>
+            <div className='flex flex-col flex-1'>
+                <Toaster />
+                {
+                    messages ?
+                        messages.map((message) => (
+                            <ul key={message.id}
                                 className={message.receiverId == selectedUser?.id ?
-                                    ` right-1 p-1 ml-4 rounded-md text-green-400` :
-                                    ` left-1 ml-4 p-1  rounded-md text-blue-400`} >
-                                {message.receiverId == selectedUser?.id ? selectedUser.name : 'Você'} :
-                            </li>
-                            <li>
-                                {message.text}
-                            </li>
-                        </ul>
-                    ))
-                    : null
-            }
+                                    ` right-1 ml-4 rounded-md bg-green-800 flex text-lg p-2 mt-2 items-center` :
+                                    ` left-1 ml-4 rounded-md bg-blue-800 flex text-lg p-2 mt-2 items-center`}
+                            >
 
-            <footer className='absolute p-2 bottom-0 w-full'>
+                                <li
+                                    className={message.receiverId == selectedUser?.id ?
+                                        ` right-1 p-1 ml-4 rounded-md text-green-400` :
+                                        ` left-1 ml-4 p-1  rounded-md text-blue-400`} >
+                                    {message.receiverId == selectedUser?.id ? selectedUser.name : 'Você'} :
+                                </li>
+                                <li>
+                                    {message.text}
+                                </li>
+                            </ul>
+                        ))
+                        : null
+                }
+            </div>
+
+            <footer className=''>
                 <MessageInput />
             </footer>
 
