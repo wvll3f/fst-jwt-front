@@ -25,7 +25,7 @@ function MessageInput() {
     };
 
     return (
-        <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
+        <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3 w-full">
             <div className="flex-1 flex gap-2">
                 <input
                     type="text"
@@ -37,10 +37,10 @@ function MessageInput() {
             </div>
             <button
                 type="submit"
-                className="btn btn-sm btn-circle cursor-pointer"
+                className="btn btn-sm btn-circle cursor-pointer p-2"
                 disabled={!text.trim()}
             >
-                <Send size={22} />
+                <Send size={28} />
             </button>
         </form>
     )

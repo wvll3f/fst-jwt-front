@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import React, { createContext, useContext, useState } from 'react';
 import { axiosInstance } from "@/app/lib/axios"; // Ensure axiosInstance is properly imported
@@ -15,6 +16,7 @@ interface IAuthStore {
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
+  isAuthenticated: boolean;
   onlineUsers: any[];
   socket: Socket | null;
   authUser: IresponseLogin | null;
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const checkAuth = async (token: string) => {
     try {
@@ -50,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (res.status === 200) {
+        setIsAuthenticated(true)
         setAuthUser((prev) => {
           if (prev) {
             return { ...prev, accessToken: res.data };
@@ -57,10 +61,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return prev;
         });
       }
-
-      console.log(`resposta do check: ${res.data}`)
     } catch (error) {
       console.error("Error in checkAuth:", error);
+      setIsAuthenticated(false)
     } finally {
       setIsCheckingAuth(false);
     }
@@ -70,7 +73,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsSigningUp(true);
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      console.log(res)
       toast.success("Account created successfully");
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -84,8 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await axiosInstance.post("/auth/login", data);
       localStorage.setItem('accessToken', res.data.accessToken);
       setAuthUser(res.data);
+      setIsAuthenticated(true)
       toast.success("Logged in successfully");
-      console.log(authUser)
     } catch (error: any) {
       toast.error(error.response.data.message);
     } finally {
@@ -98,6 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await axiosInstance.post("/auth/logout");
       localStorage.removeItem('accessToken');
       setAuthUser(null);
+      setIsAuthenticated(false)
       toast.success("Logged out successfully");
       disconnectSocket();
     } catch (error: any) {
@@ -152,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isUpdatingProfile,
       isCheckingAuth,
       onlineUsers,
+      isAuthenticated,
       connectSocket,
       disconnectSocket,
       login,

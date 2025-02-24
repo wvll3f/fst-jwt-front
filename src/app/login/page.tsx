@@ -30,7 +30,7 @@ const formSchema = z.object({
 })
 
 export default function Login() {
-    const { login, isLoggingIn, authUser } = useAuthContext();
+    const { login, isLoggingIn, authUser, isAuthenticated } = useAuthContext();
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -41,11 +41,9 @@ export default function Login() {
         },
     })
 
-    if(authUser) router.push('/');
-
     async function onSubmit(values: z.infer<typeof formSchema>) {
         await login(values)
-        if(authUser){router.push('/')}
+        if (isAuthenticated) { router.push('/') }
     }
 
     if (isLoggingIn) {
@@ -59,38 +57,38 @@ export default function Login() {
     return (
         <div className="flex flex-col bg-slate-900 text-white justify-center items-center w-screen h-screen space-y-16">
             <h1 className="font-bold text-4xl">Welcome to login page :)</h1>
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-72">
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                                <Input placeholder="user@email.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                                <Input type="password" placeholder="*******" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit">Submit</Button>
-            </form>
-            <Toaster />
-        </Form>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-72">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="user@email.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <Input type="password" placeholder="*******" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit">Submit</Button>
+                </form>
+                <Toaster />
+            </Form>
         </div>
     )
 }

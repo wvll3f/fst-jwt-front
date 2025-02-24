@@ -16,6 +16,7 @@ function SideBar() {
     useEffect(() => {
         async function callback() {
             await getUsers();
+            console.log(users)
         }
         callback()
     }, [])

@@ -40,6 +40,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isUsersLoading, setIsUsersLoading] = useState<boolean>(false);
   const [isMessagesLoading, setIsMessagesLoading] = useState<boolean>(false);
+  const { socket } = useAuthContext();
 
   const getUsers = async () => {
     setIsUsersLoading(true);
@@ -58,7 +59,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getMessages = async (id: string) => {
-    setIsMessagesLoading(true);
+    //setIsMessagesLoading(true);
     try {
       const res = await axiosInstance.get(`chat/${id}`, {
         headers: {
@@ -81,12 +82,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       setMessages(res.data)
+      console.log(res)
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
   };
-
-  const { socket } = useAuthContext();
 
   const subscribeToMessages = () => {
     if (!selectedUser) return
@@ -98,15 +98,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     };
     socket?.on("newMessage", handleNewMessage);
-  }
+  };
 
   const unsubscribleMessages = () => {
     return () => {
       socket?.off("newMessage");
     };
-  }
-
-
+  };
 
   return (
     <ChatContext.Provider value={{
