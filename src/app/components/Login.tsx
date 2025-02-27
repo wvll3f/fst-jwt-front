@@ -15,7 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useAuthStore } from "../stores/useAuthStore"
+//import { useAuthStore } from "../stores/useAuthStore"
 import { useState } from "react"
 
 const formSchema = z.object({
@@ -32,7 +32,7 @@ export function Login() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-      });
+    });
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
