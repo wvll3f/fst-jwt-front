@@ -25,7 +25,7 @@ interface IChatContext {
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
   getUsers: () => Promise<void>;
-  setSelectedUser: (selectedUser: IUser) => void;
+  setSelectedUser: (selectedUser: IUser | null) => void;
   getMessages: (id: string) => Promise<void>;
   sendMessages: (messageData: any) => Promise<void>;
   subscribeToMessages: () => void;
@@ -41,9 +41,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isUsersLoading, setIsUsersLoading] = useState<boolean>(false);
   const [isMessagesLoading, setIsMessagesLoading] = useState<boolean>(false);
   const { socket } = useAuthContext();
-
+  
   const getUsers = async () => {
-    setIsUsersLoading(true);
     try {
       const res = await axiosInstance.get("/users/sideuser", {
         headers: {

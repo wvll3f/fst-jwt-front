@@ -1,25 +1,42 @@
-'use Effect'
-import React, { useEffect } from 'react'
+'use client'
+import React, { useEffect, useRef } from 'react'
 import { LoaderIcon, Toaster } from 'react-hot-toast';
 import { useChatContext } from '../context/ChatContext';
 import MessageInput from './MessageInput';
+import { useAuthContext } from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
 const ChatContainer = () => {
     const {
         getMessages,
         isMessagesLoading,
         selectedUser,
+        setSelectedUser,
         messages,
         subscribeToMessages,
         unsubscribleMessages
     } = useChatContext();
 
+    const { checkAuth } = useAuthContext();
+
+    const messageEndRef = useRef<HTMLDivElement>(null);
+    const { push } = useRouter();
+
+    useEffect(() => {
+        checkAuth().then(() => console.log('adsadada')).catch(() => {push('/login')})
+    }, [])
+
+    useEffect(() => {
+        if (messageEndRef.current && messages) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
+
     useEffect(() => {
         getMessages(selectedUser!.id)
         subscribeToMessages();
-        unsubscribleMessages();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [subscribeToMessages])
+        return () => unsubscribleMessages();
+    }, [getMessages, selectedUser, subscribeToMessages, unsubscribleMessages])
 
     if (isMessagesLoading) return <div> <LoaderIcon /></div>;
 
@@ -28,9 +45,15 @@ const ChatContainer = () => {
             <header className='flex justify-between items-center w-full h-10 py-6 bg-slate-950 px-8 border-slate-600 border-b-2'>
                 <div className='flex justify-center items-center gap-4'>
                     <li className='p-2 rounded-full w-8 h-8 bg-white'>&nbsp;</li>
-                    <p className='capitalize font-bold text-xl' >{selectedUser ? selectedUser.name : 'chat'}</p>
+                    <p
+                        className='capitalize font-bold text-xl'>
+                        {selectedUser ? selectedUser.name : 'chat'}
+                    </p>
                 </div>
-                <p>x</p>
+                <p className='cursor-pointer' onClick={() => {
+                    setSelectedUser(null)
+                    unsubscribleMessages()
+                }}>x</p>
             </header>
             <div className='flex flex-col flex-1 overflow-y-scroll px-8 
             [&::-webkit-scrollbar]:w-2 
@@ -42,7 +65,9 @@ const ChatContainer = () => {
                 {
                     messages ?
                         messages.map((message) => (
-                            <div key={message.id}
+                            <div
+                                key={message.id}
+                                ref={messageEndRef}
                                 className={message.receiverId == selectedUser?.id ?
                                     `rounded-md bg-green-800 flex text-lg p-2 mt-2 self-end min-w-28 max-w-[50%] mb-2` :
                                     `rounded-md bg-blue-800 flex text-lg p-2 mt-2 self-start min-w-28 max-w-[50%] mb-2`}

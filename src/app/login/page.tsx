@@ -15,7 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import toast, { LoaderIcon, Toaster } from "react-hot-toast"
+import { LoaderIcon, Toaster } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { useAuthContext } from "../context/AuthContext"
@@ -30,8 +30,11 @@ const formSchema = z.object({
 })
 
 export default function Login() {
-    const { login, isLoggingIn, authUser, isAuthenticated } = useAuthContext();
-    const router = useRouter()
+    const { login, isLoggingIn, checkAuth } = useAuthContext();
+    const { push } = useRouter()
+    useEffect(() => {
+        checkAuth()
+    }, [])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -43,17 +46,15 @@ export default function Login() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         await login(values)
-        if (isAuthenticated) { router.push('/') }
     }
 
     if (isLoggingIn) {
         return (
-            <div className="flex items-center justify-center h-screen">
-                <LoaderIcon className="size-10 animate-spin" />
+            <div className="flex items-center justify-center h-screen bg-slate-900">
+                <LoaderIcon color="white" className="size-10 animate-spin" />
             </div>
         )
     }
-
 
     const shades = [
         "bg-blue-800",
@@ -66,7 +67,6 @@ export default function Login() {
         "bg-blue-800",
         "bg-blue-900",
     ];
-
 
     return (
         <div className="flex bg-slate-900 text-white justify-center items-center w-screen h-screen">
@@ -112,7 +112,7 @@ export default function Login() {
                     {shades.map((shade, index) => (
                         <div
                             key={index}
-                            className={`rounded-lg flex items-center justify-center ${shade} hover:opacity-30 animate-pulse`}
+                            className={`rounded-lg flex items-center justify-center ${shade} opacity-70 hover:opacity-30 animate-pulse backdrop-blur-md`}
                         />
                     ))}
                 </div>

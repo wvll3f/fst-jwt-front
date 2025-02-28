@@ -17,7 +17,6 @@ function SideBar() {
     useEffect(() => {
         async function callback() {
             await getUsers();
-            console.log(users)
         }
         callback()
     }, [])
@@ -34,7 +33,7 @@ function SideBar() {
 
             <aside className='w-full'>
                 <header className='p-2 bg-slate-950 border-slate-600 border-b-2'>
-                    <h1 className="font-bold text-2xl">Super Chat</h1>
+                    <h1 className="ml-4 font-bold text-2xl">Super Chat</h1>
                 </header>
                 <div>
                     <div className="flex items-center p-4 rounded-sm gap-4">
