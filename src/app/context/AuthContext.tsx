@@ -51,16 +51,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (res.status === 200) {
-        setIsAuthenticated(true)
-        setAuthUser((prev) => {
-          if (prev) {
-            return { ...prev, accessToken: res.data };
-          }
-          return prev;
-        });
-      }
+      setIsAuthenticated(true)
+      setAuthUser((prev) => {
+        if (prev) {
+          return { ...prev, accessToken: res.data };
+        }
+        return prev;
+      });
     } catch (error) {
       console.error("Error in checkAuth:", error);
       setIsAuthenticated(false)
@@ -87,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('accessToken', res.data.accessToken);
       setAuthUser(res.data);
       setIsAuthenticated(true)
+      connectSocket()
       toast.success("Logged in successfully");
     } catch (error: any) {
       toast.error(error.response.data.message);

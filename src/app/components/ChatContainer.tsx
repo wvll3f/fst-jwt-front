@@ -24,8 +24,15 @@ const ChatContainer = () => {
     if (isMessagesLoading) return <div> <LoaderIcon /></div>;
 
     return (
-        <div className='h-dvh flex flex-col justify-between gap-3 px-3 w-dvw overflow-hidden'>
-            <div className='flex flex-col flex-1 overflow-y-scroll px-5 
+        <div className='h-dvh flex flex-col justify-between gap-3 w-dvw overflow-hidden'>
+            <header className='flex justify-between items-center w-full h-10 py-6 bg-slate-950 px-8 border-slate-600 border-b-2'>
+                <div className='flex justify-center items-center gap-4'>
+                    <li className='p-2 rounded-full w-8 h-8 bg-white'>&nbsp;</li>
+                    <p className='capitalize font-bold text-xl' >{selectedUser ? selectedUser.name : 'chat'}</p>
+                </div>
+                <p>x</p>
+            </header>
+            <div className='flex flex-col flex-1 overflow-y-scroll px-8 
             [&::-webkit-scrollbar]:w-2 
             [&::-webkit-scrollbar-track]:bg-gray-800 
             [&::-webkit-scrollbar-thumb]:bg-gray-500 
@@ -62,7 +69,7 @@ const ChatContainer = () => {
                 }
             </div>
 
-            <footer className='relative border-white border-soli border-t-2 w-full'>
+            <footer className='relative border-slate-600 border-t-2 w-full'>
                 <MessageInput />
             </footer>
 
