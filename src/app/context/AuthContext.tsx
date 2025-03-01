@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-'use client'
-import React, { createContext, useContext, useState } from 'react';
-import { axiosInstance } from "@/app/lib/axios"; // Ensure axiosInstance is properly imported
+"use client";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { axiosInstance } from "@/app/lib/axios";
 import toast from "react-hot-toast";
 import { Socket } from "socket.io-client";
-import { useRouter } from 'next/navigation';
-import io from 'socket.io-client';
+import { useRouter } from "next/navigation";
+import io from "socket.io-client";
 
 interface IresponseLogin {
-  userId: string,
-  expiresIn: string,
-  accessToken: string,
-  refreshToken: string
+  userId: string;
+  expiresIn: string;
+  accessToken: string;
+  refreshToken: string;
 }
 interface IAuthStore {
   isSigningUp: boolean;
@@ -22,20 +22,23 @@ interface IAuthStore {
   onlineUsers: any[];
   socket: typeof Socket | null;
   authUser: IresponseLogin | null;
-  connectSocket: () => void;
+  connectSocket: (authUser: IresponseLogin) => void;
   disconnectSocket: () => void;
   login: (data: any) => Promise<void>;
-  checkAuth: () => Promise<boolean>;
+  checkAuth: () => Promise<void>;
   signup: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
 }
 
-const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:3333" : "/";
+const BASE_URL =
+  process.env.NODE_ENV === "development" ? "http://localhost:3333" : "/";
 
 const AuthContext = createContext<IAuthStore | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [authUser, setAuthUser] = useState<IresponseLogin | null>(null);
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -43,11 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [socket, setSocket] = useState<typeof Socket | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { push } = useRouter();
 
   const checkAuth = async () => {
-    const currentToken = localStorage.getItem('accessToken')
+    const currentDataUser = JSON.parse(localStorage.getItem("dataUser")!);
+    const currentToken = localStorage.getItem("accessToken");
     try {
       setIsCheckingAuth(true);
       const res = await axiosInstance.get("/auth/check", {
@@ -55,17 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           Authorization: `Bearer ${currentToken}`,
         },
       });
-      setIsAuthenticated(true)
-      connectSocket()
-      push('/')
-      return true
+      setIsAuthenticated(true);
+      connectSocket(currentDataUser);
+      push("/");
     } catch (error) {
       console.error("Error in checkAuth:", error);
-      setIsAuthenticated(false)
-      setAuthUser(null)
-      disconnectSocket()
-      push('/login')
-      return false
+      setIsAuthenticated(false);
+      disconnectSocket();
+      push("/login");
     } finally {
       setIsCheckingAuth(false);
     }
@@ -87,12 +88,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoggingIn(true);
       const res = await axiosInstance.post("/auth/login", data);
-      localStorage.setItem('accessToken', res.data.accessToken);
+      localStorage.setItem("accessToken", res.data.accessToken);
+      console.log(JSON.stringify(res.data));
+      localStorage.setItem("dataUser", JSON.stringify(res.data)); // Store as JSON string
       setAuthUser(res.data);
-      setIsAuthenticated(true)
-      connectSocket()
+      setIsAuthenticated(true);
+      connectSocket(res.data);
       toast.success("Logged in successfully");
-      push('/')
+      push("/");
     } catch (error: any) {
       toast.error(error.response.data.message);
     } finally {
@@ -103,9 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem("accessToken");
       setAuthUser(null);
-      setIsAuthenticated(false)
+      setIsAuthenticated(false);
       toast.success("Logged out successfully");
       disconnectSocket();
     } catch (error: any) {
@@ -127,48 +130,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const connectSocket = () => {
+  const connectSocket = (authUser: IresponseLogin) => {
+    console.log("toaqui");
+
     const newSocket = io(BASE_URL, {
       query: {
-        userId: authUser
-      }
+        userId: authUser?.userId,
+      },
     });
 
-    setSocket(newSocket);
-    socket?.connect()
+    newSocket.connect(); 
+    setSocket(newSocket); 
 
-    socket?.on("getOnlineUsers", (userIds: string[]) => {
-      setOnlineUsers(userIds);
-      console.log(`onlineUsers : ${onlineUsers}`)
-    });
-
-    socket?.on("disconnect", () => {
-      setSocket(null);
-    });
+    console.log("Socket criado:", newSocket);
   };
 
+  useEffect(() => {
+    if (!socket) return;
+
+    console.log("Socket atualizado:", socket);
+
+    socket.on("getOnlineUsers", (userIds: string[]) => {
+      setOnlineUsers(userIds);
+      console.log("Usuários online:", userIds);
+    });
+
+    socket.on("disconnect", () => {
+      setSocket(null);
+      console.log("Socket desconectado");
+    });
+
+    return () => {
+      socket.off("getOnlineUsers");
+      socket.off("disconnect");
+    };
+  }, [socket]); // Reexecuta quando o socket mudar
+
   const disconnectSocket = () => {
-    if (socket?.connected) socket.disconnect();
+    if (socket?.connected) {
+      socket.disconnect();
+      setSocket(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{
-      authUser,
-      isSigningUp,
-      isLoggingIn,
-      isUpdatingProfile,
-      isCheckingAuth,
-      onlineUsers,
-      isAuthenticated,
-      connectSocket,
-      disconnectSocket,
-      login,
-      checkAuth,
-      signup,
-      logout,
-      updateProfile,
-      socket
-    }}>
+    <AuthContext.Provider
+      value={{
+        authUser,
+        isSigningUp,
+        isLoggingIn,
+        isUpdatingProfile,
+        isCheckingAuth,
+        onlineUsers,
+        isAuthenticated,
+        connectSocket,
+        disconnectSocket,
+        login,
+        checkAuth,
+        signup,
+        logout,
+        updateProfile,
+        socket,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { useChatContext } from '../context/ChatContext';
 import { Send } from "lucide-react";
+import { useChatStore } from '../store/chat';
 
 function MessageInput() {
 
     const [text, setText] = useState("");
 
 
-    const { sendMessages } = useChatContext();
+    const { sendMessages } = useChatStore();
 
     const handleSendMessage = async (e: any) => {
         e.preventDefault();

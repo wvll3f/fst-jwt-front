@@ -1,20 +1,21 @@
 'use client'
-import { useChatContext } from "./context/ChatContext";
 import NoChatSelected from "./components/NoChatSelected";
 import ChatContainer from "./components/ChatContainer";
 import SideBar from "./components/SideBar";
-import { useAuthContext } from "./context/AuthContext";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
+import { useAuthStore } from "./store/auth";
+import { useChatStore } from "./store/chat";
+
 
 export default function Home() {
-
-  const { checkAuth, authUser, isCheckingAuth } = useAuthContext();
-  const { selectedUser } = useChatContext();
+ 
+  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+  const { selectedUser } = useChatStore();
 
   useEffect(() => {
     checkAuth()
-    console.log(authUser)
+
   }, [])
 
   if (isCheckingAuth && !authUser)
