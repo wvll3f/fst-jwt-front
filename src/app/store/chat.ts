@@ -11,11 +11,13 @@ export type IUser = {
 };
 
 type Message = {
-    id: string;
-    text: string;
+    id: number;
     senderId: string;
     receiverId: string;
-    timestamp: string;
+    text: string;
+    image: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 interface ChatState {
@@ -72,30 +74,53 @@ export const useChatStore = create<ChatState>((set, get) => ({
     },
 
     sendMessages: async (messageData: any) => {
-        const { selectedUser } = get();
+        const { selectedUser, messages } = get();
         if (!selectedUser) return;
 
         try {
-            const res = await axiosInstance.post(`/chat/new-message/${selectedUser.id}`, messageData, {
-                headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-            });
-            set({ messages: res.data });
+            const res = await axiosInstance.post(
+                `/chat/new-message/${selectedUser.id}`,
+                messageData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                }
+            );
+            set({ messages: [...messages, res.data] });
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Erro ao enviar mensagem");
         }
     },
 
-    subscribeToMessages: () => {
-        const { selectedUser } = get();
-        const { socket } = useAuthStore.getState();
-        if (!selectedUser || !socket) return;
 
-        const handleNewMessage = (newMessage: any) => {
-            if (selectedUser && newMessage.senderId === selectedUser.id) {
-                set((state) => ({ messages: [...state.messages, newMessage] }));
-            }
-        };
-        socket.on("newMessage", handleNewMessage);
+    subscribeToMessages: () => {
+        // const { selectedUser } = get();
+        // const { socket } = useAuthStore.getState();
+
+        // if (!selectedUser || !socket) return;
+
+        // const handleNewMessage = (newMessage: any) => {
+        //     console.log(newMessage)
+        //     if (selectedUser && newMessage.senderId === selectedUser.id) {
+        //         set((state) => ({ messages: [...state.messages, newMessage] }));
+        //     }
+        //     console.log(newMessage)
+        // };
+        // socket.on("newMessage", handleNewMessage);
+        const { selectedUser } = get();
+        if (!selectedUser) return;
+    
+        const socket = useAuthStore.getState().socket;
+    
+        socket?.on("newMessage", (newMessage:Message) => {
+          const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser.id;
+          if (!isMessageSentFromSelectedUser) return;
+    
+          set({
+            messages: [...get().messages, newMessage],
+          });
+        });
     },
 
     unsubscribeMessages: () => {

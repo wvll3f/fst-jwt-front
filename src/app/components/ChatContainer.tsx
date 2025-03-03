@@ -1,15 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useLayoutEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { LoaderIcon, Toaster } from "react-hot-toast";
 import MessageInput from "./MessageInput";
 import { CircleX } from "lucide-react";
 import { useChatStore } from "../store/chat";
-
-type MessageType = {
-  id: string;
-  text: string;
-  receiverId: string;
-};
 
 const ChatContainer = () => {
   const {
@@ -23,30 +17,20 @@ const ChatContainer = () => {
   } = useChatStore();
 
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const prevMessagesLength = useRef<number>(0);
-  const [messageList, setMessageList] = useState<MessageType[]>([]);
+
 
   useEffect(() => {
-    if (
-      Array.isArray(messages) &&
-      messages.length !== prevMessagesLength.current
-    ) {
-      setMessageList(messages);
-      prevMessagesLength.current = messages.length;
-    }
-  }, [messages]);
-
-  useLayoutEffect(() => {
-    if (messageEndRef.current) {
+    if (messageEndRef.current && messages) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messageList]);
+  }, [messages]);
 
   useEffect(() => {
     getMessages(selectedUser!.id);
     subscribeToMessages();
     return () => unsubscribeMessages();
   }, [getMessages, selectedUser, subscribeToMessages, unsubscribeMessages]);
+
 
   if (isMessagesLoading)
     return (
@@ -82,14 +66,14 @@ const ChatContainer = () => {
             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
       >
         <Toaster />
-        {messageList.length > 0 &&
-          messageList.map((message) => (
+        {messages.length > 0 &&
+          messages.map((message, index) => (
             <div
-              key={message.id}
+              key={message.id ? `${message.id}-${index}` : `message-${index}`}
               className={
                 message.receiverId === selectedUser?.id
-                  ? `rounded-md bg-green-800 flex text-lg p-2 mt-2 self-end min-w-28 max-w-[50%] mb-2`
-                  : `rounded-md bg-blue-800 flex text-lg p-2 mt-2 self-start min-w-28 max-w-[50%] mb-2`
+                  ? "rounded-md bg-green-800 flex text-lg p-2 mt-2 self-end min-w-28 max-w-[50%] mb-2"
+                  : "rounded-md bg-blue-800 flex text-lg p-2 mt-2 self-start min-w-28 max-w-[50%] mb-2"
               }
             >
               <div
@@ -102,18 +86,18 @@ const ChatContainer = () => {
                 <span
                   className={
                     message.receiverId === selectedUser?.id
-                      ? `text-green-400 self-end`
-                      : `text-blue-400 self-start`
+                      ? "text-green-400 self-end"
+                      : "text-blue-400 self-start"
                   }
                 >
-                  {message.receiverId === selectedUser?.id
-                    ? "Você"
-                    : selectedUser?.name}
+                  {message.receiverId === selectedUser?.id ? "Você" : selectedUser?.name}
                 </span>
                 <span className="p-0 m-0">{message.text}</span>
               </div>
             </div>
-          ))}
+          ))
+        }
+
         <div ref={messageEndRef}></div>
       </div>
 
