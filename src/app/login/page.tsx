@@ -31,9 +31,13 @@ const formSchema = z.object({
 
 export default function Login() {
   const { login, isLoggingIn, checkAuth } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
-    checkAuth();
+    const callback = async () => {
+      await checkAuth();
+    };
+    callback();
   }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,6 +50,7 @@ export default function Login() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await login(values);
+    router.push("/")
   }
 
   if (isLoggingIn) {
